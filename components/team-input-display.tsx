@@ -9,6 +9,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { Stats } from 'fs';
+import StatsBoard from './stats-board';
 
 
 const TeamDisplay = () => {
@@ -102,6 +104,7 @@ const TeamDisplay = () => {
             <span>vs</span>
             <span className="">{awayTeam}</span>
           </div>
+          <StatsBoard homeName={homeTeam} awayName={awayTeam} />
         </div>
       )}
     </div>
