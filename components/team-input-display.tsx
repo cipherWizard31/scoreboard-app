@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,44 +9,41 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { Stats } from 'fs';
-import StatsBoard from './stats-board';
-
+import { Stats } from "fs";
+import StatsBoard from "./stats-board";
 
 const TeamDisplay = () => {
+  const [open, setOpen] = useState(false);
+  const [homeTeam, setHomeTeam] = useState("");
+  const [awayTeam, setAwayTeam] = useState("");
+  const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-     const [open, setOpen] = useState(false);
-      const [homeTeam, setHomeTeam] = useState("");
-      const [awayTeam, setAwayTeam] = useState("");
-      const [error, setError] = useState("");
-      const [submitted, setSubmitted] = useState(false);
-    
-      // Automatically open dialog on load
-      useEffect(() => {
-        setOpen(true);
-      }, []);
-    
-      const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-    
-        
-        if (!homeTeam.trim() || !awayTeam.trim()) {
-          setError("Both team names are required!");
-          return;
-        }
-        if (homeTeam == awayTeam) {
-          setError("Team names can't be the same!");
-          return;
-        }
-        // Mark as submitted, close dialog
-        setError("");
-        setOpen(false);
-        setSubmitted(true);
-      };
-    
+  // Automatically open dialog on load
+  useEffect(() => {
+    setOpen(true);
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!homeTeam.trim() || !awayTeam.trim()) {
+      setError("Both team names are required!");
+      return;
+    }
+    if (homeTeam == awayTeam) {
+      setError("Team names can't be the same!");
+      return;
+    }
+    // Mark as submitted, close dialog
+    setError("");
+    setOpen(false);
+    setSubmitted(true);
+  };
+
   return (
     <div>
-        {/* Dialog for entering team names */}
+      {/* Dialog for entering team names */}
       <Dialog
         open={open}
         onOpenChange={(value) => {
@@ -99,15 +96,15 @@ const TeamDisplay = () => {
       {submitted && (
         <div className="text-center mt-8">
           <h1 className="text-3xl font-bold mb-2">🏟️ Matchday</h1>
-          <div className="grid grid-cols-3 font-semibold text-center mb-4 text-2xl">
-        <span>{homeTeam}</span>
-        <span className="opacity-70">Vs</span>
-        <span>{awayTeam}</span>
-      </div>
+          <div className="grid grid-cols-3 gap-3 font-semibold text-center mb-4 text-2xl">
+            <span>{homeTeam}</span>
+            <span className="opacity-70">Vs</span>
+            <span>{awayTeam}</span>
+          </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 export default TeamDisplay;

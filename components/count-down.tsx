@@ -102,7 +102,7 @@ export default function Countdown() {
     <div className="flex flex-col items-center justify-center h-min w-full mt-0">
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-200 text-center">
-          Football Timer
+          Match Timer
         </h1>
         <div className="flex justify-center gap-4 mb-6">
           <Button
