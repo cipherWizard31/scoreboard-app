@@ -76,17 +76,13 @@ export default function StatsBoard() {
   ]
 
   return (
-    <div className="w-full max-w-2xl mx-auto mt-10 text-white">
-      <div className="grid grid-cols-3 font-semibold text-center mb-4 text-xl">
-        <span>{home.name}</span>
-        <span className="opacity-70">TEAM STATS</span>
-        <span>{away.name}</span>
-      </div>
+    <div className="w-full max-w-2xl mx-auto mt-10 text-center">
+      <span className="text-3xl w-full text-center">Stats</span>
 
       {statsList.map(stat => (
         <div
           key={stat.key}
-          className="grid grid-cols-3 items-center py-3 border-b border-white/10"
+          className="grid grid-cols-3 gap-10 items-center py-3 border-b border-white/10"
         >
           {/* Home side */}
           <div className="flex items-center justify-center gap-2">

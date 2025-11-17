@@ -99,12 +99,11 @@ const TeamDisplay = () => {
       {submitted && (
         <div className="text-center mt-8">
           <h1 className="text-3xl font-bold mb-2">🏟️ Matchday</h1>
-          <div className="flex items-center justify-center gap-6 text-2xl font-semibold">
-            <span className="">{homeTeam}</span>
-            <span>vs</span>
-            <span className="">{awayTeam}</span>
-          </div>
-          <StatsBoard homeName={homeTeam} awayName={awayTeam} />
+          <div className="grid grid-cols-3 font-semibold text-center mb-4 text-2xl">
+        <span>{homeTeam}</span>
+        <span className="opacity-70">Vs</span>
+        <span>{awayTeam}</span>
+      </div>
         </div>
       )}
     </div>
