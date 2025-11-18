@@ -77,9 +77,10 @@ export default function Countdown() {
             clearInterval(timerRef.current!);
           }
 
-          // If time is up, clear the interval
+          // If time is up, clear the interval and show alert
           if (prevTime <= 1) {
             clearInterval(timerRef.current!);
+            window.alert("Match finished");
             return 0;
           }
 
