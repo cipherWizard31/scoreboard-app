@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useTimer } from "./TimerContext";
 
 export default function Countdown() {
   const [timeLeft, setTimeLeft] = useState<number>(0);
@@ -10,6 +11,7 @@ export default function Countdown() {
   const [showHalftimeModal, setShowHalftimeModal] = useState<boolean>(false);
   const [totalDuration, setTotalDuration] = useState<number>(0); // Track the total duration
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { isRunning, setIsRunning } = useTimer();
 
   // Function to set the duration of the countdown
   const handleSetDuration = (minutes: number): void => {
@@ -29,6 +31,7 @@ export default function Countdown() {
     if (timeLeft > 0) {
       setIsActive(true);
       setIsPaused(false);
+      setIsRunning(true);
     }
   };
 
@@ -40,6 +43,7 @@ export default function Countdown() {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
+      setIsRunning(false);
     }
   };
 

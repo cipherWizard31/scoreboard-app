@@ -1,24 +1,27 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
+import { useTimer } from "./TimerContext";
 
 type Stats = {
-  shots: number
-  shotsOnTarget: number
-  possession: number
-  fouls: number
-  yellowCards: number
-  redCards: number
-  offsides: number
-  corners: number
-}
+  goals: number; // Added "goals" to the Stats type
+  shots: number;
+  shotsOnTarget: number;
+  possession: number;
+  fouls: number;
+  yellowCards: number;
+  redCards: number;
+  offsides: number;
+  corners: number;
+};
 
 type TeamData = {
-  name: string
-  stats: Stats
-}
+  name: string;
+  stats: Stats;
+};
 
 const defaultStats: Stats = {
+  goals: 0, // Added default value for "goals"
   shots: 0,
   shotsOnTarget: 0,
   possession: 50,
@@ -26,45 +29,42 @@ const defaultStats: Stats = {
   yellowCards: 0,
   redCards: 0,
   offsides: 0,
-  corners: 0
-}
+  corners: 0,
+};
 
 export default function StatsBoard() {
+  const { isRunning, setIsRunning } = useTimer();
   const [home, setHome] = useState<TeamData>({
     name: "Home",
-    stats: { ...defaultStats }
-  })
+    stats: { ...defaultStats },
+  });
 
   const [away, setAway] = useState<TeamData>({
     name: "Away",
-    stats: { ...defaultStats }
-  })
+    stats: { ...defaultStats },
+  });
 
-  function updateStat(
-    team: "home" | "away",
-    stat: keyof Stats,
-    delta: number
-  ) {
+  function updateStat(team: "home" | "away", stat: keyof Stats, delta: number) {
     if (team === "home") {
-      setHome(prev => ({
+      setHome((prev) => ({
         ...prev,
         stats: {
           ...prev.stats,
-          [stat]: Math.max(0, prev.stats[stat] + delta)
-        }
-      }))
+          [stat]: Math.max(0, prev.stats[stat] + delta),
+        },
+      }));
     } else {
-      setAway(prev => ({
+      setAway((prev) => ({
         ...prev,
         stats: {
           ...prev.stats,
-          [stat]: Math.max(0, prev.stats[stat] + delta)
-        }
-      }))
+          [stat]: Math.max(0, prev.stats[stat] + delta),
+        },
+      }));
     }
   }
-
   const statsList: { key: keyof Stats; label: string }[] = [
+    { key: "goals", label: "Goals" }, // Added "Goals" as the first stat
     { key: "shots", label: "Shots" },
     { key: "shotsOnTarget", label: "Shots on target" },
     { key: "possession", label: "Possession" },
@@ -72,14 +72,14 @@ export default function StatsBoard() {
     { key: "yellowCards", label: "Yellow cards" },
     { key: "redCards", label: "Red cards" },
     { key: "offsides", label: "Offsides" },
-    { key: "corners", label: "Corners" }
-  ]
+    { key: "corners", label: "Corners" },
+  ];
 
   return (
     <div className="w-full max-w-2xl mx-auto mt-10 text-center">
       <span className="text-3xl w-full text-center">Stats</span>
 
-      {statsList.map(stat => (
+      {statsList.map((stat) => (
         <div
           key={stat.key}
           className="grid grid-cols-3 gap-10 items-center py-3 border-b border-white/10"
@@ -89,6 +89,7 @@ export default function StatsBoard() {
             <button
               onClick={() => updateStat("home", stat.key, -1)}
               className="px-2 py-1 bg-red-600 rounded"
+              disabled={!isRunning}
             >
               –
             </button>
@@ -98,15 +99,14 @@ export default function StatsBoard() {
             <button
               onClick={() => updateStat("home", stat.key, 1)}
               className="px-2 py-1 bg-green-600 rounded"
+              disabled={!isRunning}
             >
               +
             </button>
           </div>
 
           {/* Label */}
-          <div className="text-center text-sm opacity-70">
-            {stat.label}
-          </div>
+          <div className="text-center text-sm opacity-70">{stat.label}</div>
 
           {/* Away side */}
           <div className="flex items-center justify-center gap-2">
@@ -129,5 +129,5 @@ export default function StatsBoard() {
         </div>
       ))}
     </div>
-  )
+  );
 }
