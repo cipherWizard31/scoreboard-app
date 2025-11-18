@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useTimer } from "./TimerContext";
+import { Button } from "./ui/button";
 
 type Stats = {
-  goals: number; // Added "goals" to the Stats type
+  goals: number;
   shots: number;
   shotsOnTarget: number;
   possession: number;
@@ -21,7 +22,7 @@ type TeamData = {
 };
 
 const defaultStats: Stats = {
-  goals: 0, // Added default value for "goals"
+  goals: 0,
   shots: 0,
   shotsOnTarget: 0,
   possession: 50,
@@ -33,7 +34,8 @@ const defaultStats: Stats = {
 };
 
 export default function StatsBoard() {
-  const { isRunning, setIsRunning } = useTimer();
+  const { isRunning } = useTimer();
+
   const [home, setHome] = useState<TeamData>({
     name: "Home",
     stats: { ...defaultStats },
@@ -45,26 +47,78 @@ export default function StatsBoard() {
   });
 
   function updateStat(team: "home" | "away", stat: keyof Stats, delta: number) {
-    if (team === "home") {
-      setHome((prev) => ({
-        ...prev,
-        stats: {
-          ...prev.stats,
-          [stat]: Math.max(0, prev.stats[stat] + delta),
-        },
-      }));
-    } else {
-      setAway((prev) => ({
-        ...prev,
-        stats: {
-          ...prev.stats,
-          [stat]: Math.max(0, prev.stats[stat] + delta),
-        },
-      }));
+    const setter = team === "home" ? setHome : setAway;
+    const oppositeSetter = team === "home" ? setAway : setHome;
+
+    setter((prev) => {
+      const updatedValue = Math.max(0, prev.stats[stat] + delta);
+      const updatedStats = { ...prev.stats, [stat]: updatedValue };
+
+      // 1. If Goals increase → increment shots & shotsOnTarget
+      if (stat === "goals" && delta > 0) {
+        updatedStats.shots += 1;
+        updatedStats.shotsOnTarget += 1;
+      }
+
+      return { ...prev, stats: updatedStats };
+    });
+
+    // 2. Possession is zero-sum – adjust the opposing team automatically
+    if (stat === "possession") {
+      oppositeSetter((prev) => {
+        const newValue = Math.max(
+          0,
+          Math.min(100, prev.stats.possession - delta)
+        );
+        return {
+          ...prev,
+          stats: { ...prev.stats, possession: newValue },
+        };
+      });
     }
   }
-  const statsList: { key: keyof Stats; label: string }[] = [
-    { key: "goals", label: "Goals" }, // Added "Goals" as the first stat
+
+  // 3. Export Stats → TXT file
+  function exportStats() {
+    const text = `
+${home.name} Stats
+-------------------
+Goals: ${home.stats.goals}
+Shots: ${home.stats.shots}
+Shots on Target: ${home.stats.shotsOnTarget}
+Possession: ${home.stats.possession}%
+Fouls: ${home.stats.fouls}
+Yellow Cards: ${home.stats.yellowCards}
+Red Cards: ${home.stats.redCards}
+Offsides: ${home.stats.offsides}
+Corners: ${home.stats.corners}
+
+${away.name} Stats
+-------------------
+Goals: ${away.stats.goals}
+Shots: ${away.stats.shots}
+Shots on Target: ${away.stats.shotsOnTarget}
+Possession: ${away.stats.possession}%
+Fouls: ${away.stats.fouls}
+Yellow Cards: ${away.stats.yellowCards}
+Red Cards: ${away.stats.redCards}
+Offsides: ${away.stats.offsides}
+Corners: ${away.stats.corners}
+`;
+
+    const blob = new Blob([text], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "match-stats.txt";
+    a.click();
+
+    URL.revokeObjectURL(url);
+  }
+
+  const statsList = [
+    { key: "goals", label: "Goals" },
     { key: "shots", label: "Shots" },
     { key: "shotsOnTarget", label: "Shots on target" },
     { key: "possession", label: "Possession" },
@@ -73,10 +127,14 @@ export default function StatsBoard() {
     { key: "redCards", label: "Red cards" },
     { key: "offsides", label: "Offsides" },
     { key: "corners", label: "Corners" },
-  ];
+  ] as const;
 
   return (
     <div className="w-full max-w-2xl mx-auto mt-10 text-center">
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=description"
+      />
       <span className="text-3xl w-full text-center">Stats</span>
 
       {statsList.map((stat) => (
@@ -93,9 +151,11 @@ export default function StatsBoard() {
             >
               –
             </button>
+
             <span className="text-lg w-8 text-center">
               {home.stats[stat.key]}
             </span>
+
             <button
               onClick={() => updateStat("home", stat.key, 1)}
               className="px-2 py-1 bg-green-600 rounded"
@@ -113,21 +173,31 @@ export default function StatsBoard() {
             <button
               onClick={() => updateStat("away", stat.key, -1)}
               className="px-2 py-1 bg-red-600 rounded"
+              disabled={!isRunning}
             >
               –
             </button>
+
             <span className="text-lg w-8 text-center">
               {away.stats[stat.key]}
             </span>
+
             <button
               onClick={() => updateStat("away", stat.key, 1)}
               className="px-2 py-1 bg-green-600 rounded"
+              disabled={!isRunning}
             >
               +
             </button>
           </div>
         </div>
       ))}
+
+      {/* Export Button */}
+      <Button onClick={exportStats} className=" my-5">
+        <span className="material-symbols-outlined">description</span>
+        Export Stats
+      </Button>
     </div>
   );
 }
